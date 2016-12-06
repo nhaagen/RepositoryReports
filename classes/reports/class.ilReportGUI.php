@@ -82,9 +82,10 @@ class ilReportGUI {
 
 
 	private function executeReport($report) {
+		$titles = $this->getRow();
 		$rowdata = $this->getRowData();
-		$titles = array_values($this->getRow());
 		$this->gTpl->setContent($this->htmlTable($titles, $rowdata));
+		$this->exportXLS($titles, $rowdata);
 	}
 
 
@@ -93,7 +94,7 @@ class ilReportGUI {
 	private function htmlTable(array $titles, array $rowdata) {
 		$buf = '<table border=1>';
 		$buf .= '<tr><th>';
-		$buf .= join('</th><th>', $titles);
+		$buf .= join('</th><th>', array_values($titles));
 		$buf .= '</th></tr>';
 
 		foreach ($rowdata as $row) {
@@ -105,9 +106,55 @@ class ilReportGUI {
 		return $buf;
 	}
 
+
+	private function getExportFilename() {
+		return 'report.xls';
+	}
+
 	private function exportXLS(array $titles, array $rowdata) {
 
+		require_once "Services/Excel/classes/class.ilExcelUtils.php";
+		require_once "Services/Excel/classes/class.ilExcelWriterAdapter.php";
+
+		$fname = $this->getExportFilename();
+
+		ob_clean();
+		$adapter = new ilExcelWriterAdapter($fname, true);
+		$workbook = $adapter->getWorkbook();
+		$worksheet = $workbook->addWorksheet();
+		$worksheet->setLandscape();
+
+		//available formats within the sheet
+		$format_bold = $workbook->addFormat(array("bold" => 1));
+		$format_wrap = $workbook->addFormat();
+		$format_wrap->setTextWrap();
+
+		//init cols and write titles
+		$colcount = 0;
+		foreach ($titles as $colkey=>$title) {
+			$worksheet->setColumn($colcount, $colcount, 30); //width
+			$worksheet->writeString(0, $colcount, $title, $format_bold);
+			$colcount++;
+		}
+
+		//write data-rows
+		$rowcount = 1;
+		foreach ($rowdata as $entry) {
+			$colcount = 0;
+			foreach ($titles as $colkey=>$title) {
+				$v = $entry[$colkey];
+				$worksheet->write($rowcount, $colcount, $v, $format_wrap);
+				$colcount++;
+			}
+			$rowcount++;
+		}
+
+		$workbook->close();
 	}
+
+
+
+
 
 
 

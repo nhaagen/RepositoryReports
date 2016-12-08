@@ -1,11 +1,11 @@
 <?php
-
+namespace CaT\Plugins\RepositoryReports\Settings;
 /**
- * Interface for DB handle of additional setting values
+ * Interface for DB to handle of additional settings
  */
 interface DB {
 	/**
-	 * Install tables and standard contents and types.
+	 * Install tables
 	 */
 	public function install();
 
@@ -14,19 +14,7 @@ interface DB {
 	 *
 	 * @param	<PLUGINNAME>		$settings
 	 */
-	public function update(<PLUGINNAME> $settings);
-
-	/**
-	 * Create a new settings object for <PLUGINNAME> object.
-	 *
-	 * @param	int		$obj_id
-	 * @param	int		$study_content
-	 * @param	int		$study_type
-	 * @param	int		$credit_points
-	 *
-	 * @return \CaT\Plugins\<PLUGINNAME>\Settings\<PLUGINNAME>
-	 */
-	public function create($obj_id, /*additonal setting values*/);
+	public function update($obj_id, array $settings);
 
 	/**
 	 * return <PLUGINNAME> for $obj_id

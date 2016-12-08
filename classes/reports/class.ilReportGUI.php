@@ -44,10 +44,7 @@ class ilReportGUI {
 			default:
 				$cmd = self::CMD_STANDARD;
 				$this->$cmd();
-
 		}
-
-
 	}
 
 
@@ -63,7 +60,6 @@ class ilReportGUI {
 
 
 	private function reportSelectionInput() {
-
 		//$si = new \ilSelectInputGUI($this->txt("possible_packages"), ilActions::F_PACKAGE);
 		$options = $this->availableReports();
 		//property-label, input name
@@ -85,7 +81,7 @@ class ilReportGUI {
 		$titles = $this->getRow();
 		$rowdata = $this->getRowData();
 		$this->gTpl->setContent($this->htmlTable($titles, $rowdata));
-		$this->exportXLS($titles, $rowdata);
+		//$this->exportXLS($titles, $rowdata);
 	}
 
 

@@ -47,6 +47,7 @@ class ilReportConfigGUI {
 
 		switch ($cmd) {
 			case self::CMD_STORE:
+			case self::CMD_ADDITEM:
 				$this->$cmd();
 				break;
 
@@ -88,6 +89,43 @@ class ilReportConfigGUI {
 	}
 
 
+	public function cfgStore() {
+		$post = $_POST;
+		$settings = $this->extractRFPostValues($post);
+		$this->storeToDB($settings);
+
+		$cmd = self::CMD_CONFIG;
+		$this->$cmd();
+	}
+
+	public function cfgAddItem() {
+		$post = $_POST;
+		$settings = $this->extractRFPostValues($post);
+
+		//get next field id
+		$db = new Settings\ilDB($this->gDB);
+		$nu_id = $db->getNextFieldFor($this->parent->getObjId());
+
+		//add a blank setting
+		$setting = new Settings\RepositoryReportsSetting (
+			$nu_id,
+			'-',
+			'blank',
+			''
+		);
+		array_push($settings, $setting);
+		$this->storeToDB($settings);
+
+		$cmd = self::CMD_CONFIG;
+		$this->$cmd();
+	}
+
+
+
+
+	/**
+	* @return array <Settings\RepositoryReportsSetting>
+	*/
 	private function readDB() {
 		$db = new Settings\ilDB($this->gDB);
 		$values = $db->selectFor($this->parent->getObjId());
@@ -100,18 +138,6 @@ class ilReportConfigGUI {
 	private function storeToDB($settings) {
 		$db = new Settings\ilDB($this->gDB);
 		$db->update($this->parent->getObjId(), $settings);
-
-	}
-
-
-
-	public function cfgStore() {
-		$post = $_POST;
-		$settings = $this->extractRFPostValues($post);
-		$this->storeToDB($settings);
-
-		$cmd = self::CMD_CONFIG;
-		$this->$cmd();
 	}
 
 	/**

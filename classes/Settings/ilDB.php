@@ -77,6 +77,21 @@ class ilDB { //implements DB {
 		return $ret;
 	}
 
+	public function getNextFieldFor($obj_id) {
+		$query = 'SELECT id FROM '.static::TABLE_SETTINGS
+			.' WHERE obj_id = ' .$this->gDB->quote($obj_id, 'integer')
+			.' ORDER BY id DESC LIMIT 1';
+
+		$res = $this->gDB->query($query);
+		if($this->gDB->numRows($res) == 0) {
+			return 'f1';
+		}
+		$sid = $this->gDB->fetchAssoc($res)['id'];
+		$nu =  intval(substr($sid, 1)) + 1;
+		return 'f' .$nu;
+	}
+
+
 	/**
 	 * Delete all information of the given obj id
 	 *
@@ -108,7 +123,7 @@ class ilDB { //implements DB {
 			'title' => array(
 				'type' => 'text',
 				'length' => 128,
-				'notnull' => true
+				'notnull' => false
 			),
 			'type' => array( // "blank"||"memberbelow"||"learningprogress"
 				'type' => 'text',

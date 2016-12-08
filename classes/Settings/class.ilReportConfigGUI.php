@@ -29,10 +29,12 @@ class ilReportConfigGUI {
 
 
 	public function __construct($parent, \Closure $txt) {
-		global $tpl, $ilCtrl, $ilTabs;
+		global $tpl, $ilCtrl, $ilTabs, $ilDB;
 		$this->gTpl = $tpl;
 		$this->gCtrl = $ilCtrl;
 		$this->gTabs = $ilTabs;
+
+		$this->gDB = $ilDB;
 
 		$this->parent = $parent;
 		$this->actions = $actions;
@@ -58,14 +60,22 @@ class ilReportConfigGUI {
 
 	public function configureReport() {
 		$form = new \ilPropertyFormGUI();
+		$formvalues = array();
 
-		$formvalues = $this->readDB();
+		$settings = $this->readDB();
+		foreach ($settings as $setting) {
 
-		$repfield = new ilReportFieldDefinitionGUI('name', 'var1');
-		$repfield2 = new ilReportFieldDefinitionGUI('name2', 'var2');
-
-		$form->addItem($repfield);
-		$form->addItem($repfield2);
+			$repfield = new Settings\ilReportFieldDefinitionGUI(
+				$setting->id(), //name
+				$setting->id() //postvar
+			);
+			$form->addItem($repfield);
+			$formvalues[$setting->id()] = array(
+				'title' => $setting->title(),
+				'type' => $setting->type(),
+				'ref_id' => $setting->ref_id(),
+			);
+		}
 
 		$form->setValuesByArray($formvalues);
 
@@ -79,39 +89,59 @@ class ilReportConfigGUI {
 
 
 	private function readDB() {
+		$db = new Settings\ilDB($this->gDB);
+		$values = $db->selectFor($this->parent->getObjId());
+		return $values;
+	}
 
-		return array(
-			'var1' => array('title'=>'sometitle', 'type'=>'learningprogress', 'ref_id'=>12),
-			'var2' => array('title'=>'sometitle', 'type'=>'memberbelow', 'ref_id'=>33),
-
-		);
+	/**
+	* @param $settings array <Settings\RepositoryReportsSetting>
+	*/
+	private function storeToDB($settings) {
+		$db = new Settings\ilDB($this->gDB);
+		$db->update($this->parent->getObjId(), $settings);
 
 	}
+
+
 
 	public function cfgStore() {
-
 		$post = $_POST;
-		$post_extract = $this->extractRFPostValues($post);
+		$settings = $this->extractRFPostValues($post);
+		$this->storeToDB($settings);
 
-		$this->gTpl->setContent(print_r($post_extract,1));
+		$cmd = self::CMD_CONFIG;
+		$this->$cmd();
 	}
 
-
+	/**
+	* @return array <Settings\RepositoryReportsSetting>
+	*/
 	private function extractRFPostValues($post) {
 		$ret = array();
+		$values = array();
 		foreach ($post as $key => $value) {
 			if(substr($key, -3) === '_rf') {
 				$len = strlen($key);
 				$var = substr($key, 0, $len - 9);
 				$suffix = substr($key, -8, 5);
-				if(! array_key_exists($var, $ret))  {
-					$ret[$var] = array();
+				if(! array_key_exists($var, $values))  {
+					$values[$var] = array();
 				}
-				$ret[$var][$suffix] = $value;
+				$values[$var][$suffix] = $value;
 			}
 		}
-		return $ret;
 
+		foreach ($values as $id => $data) {
+			$setting = new Settings\RepositoryReportsSetting (
+					$id,
+					$data['title'],
+					$data['ftype'],
+					$data['refid']
+				);
+			array_push($ret, $setting);
+		}
+		return $ret;
 	}
 
 

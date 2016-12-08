@@ -128,6 +128,9 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 		$this->gTpl->setContent($info->getHTML());
 	}
 
+	public function getObjId() {
+		return $this->object_id;
+	}
 
 
 }

@@ -9,11 +9,6 @@ class RepositoryReportsSetting {
 	/**
 	 * @var string
 	 */
-	private $obj_id;
-
-	/**
-	 * @var string
-	 */
 	private $id;
 
 	/**
@@ -41,7 +36,7 @@ class RepositoryReportsSetting {
 		assert('is_string($id)');
 		assert('is_string($title)');
 		assert('is_string($type)');
-		assert('is_int($ref_id)');
+		//assert('(is_int($ref_id) || $ref_id=='')';
 
 		if(! $this->isValidType($type)) {
 			throw new \InvalidArgumentException('not a valid type: ' .$type);
@@ -83,12 +78,23 @@ class RepositoryReportsSetting {
 		);
 	}
 
+
+	public function id() {
+		return $this->id;
+	}
+	public function title() {
+		return $this->title;
+	}
+	public function ref_id() {
+		return $this->ref_id;
+	}
+
 	/**
 	 * get type
 	 *
 	 * @return string
 	 */
-	public function getType() {
+	public function type() {
 		return $this->type;
 	}
 

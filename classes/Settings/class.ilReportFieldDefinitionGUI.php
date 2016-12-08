@@ -1,4 +1,5 @@
 <?php
+namespace CaT\Plugins\RepositoryReports\Settings;
 include_once("./Services/Form/classes/class.ilFormPropertyGUI.php");
 
 /**
@@ -9,7 +10,7 @@ include_once("./Services/Form/classes/class.ilFormPropertyGUI.php");
 *
 * @ingroup	ServicesForm
 */
-class ilReportFieldDefinitionGUI extends ilFormPropertyGUI {
+class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 
 	protected $value;
 
@@ -75,9 +76,6 @@ class ilReportFieldDefinitionGUI extends ilFormPropertyGUI {
 			$inpt_refid
 		));
 
-		$html .= $this->getPostVar();
-		$html .= $this->getValue();
-
 		$a_tpl->setCurrentBlock("prop_generic");
 		$a_tpl->setVariable("PROP_GENERIC", $html);
 		$a_tpl->parseCurrentBlock();
@@ -87,6 +85,7 @@ class ilReportFieldDefinitionGUI extends ilFormPropertyGUI {
 	* @param array $value 	array with keys: title, type, ref_id
 	*/
 	public function setValue($value) {
+		//check validity!
 		$this->value = $value;
 	}
 	public function getValue() {

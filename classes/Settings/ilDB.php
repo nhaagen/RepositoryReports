@@ -3,7 +3,7 @@ namespace CaT\Plugins\RepositoryReports\Settings;
 /**
  * Interface for DB to handle of additional settings
  */
-class ilDB implements DB{
+class ilDB { //implements DB {
 	/**
 	 * @var gDB \ilDB
 	 */
@@ -11,7 +11,7 @@ class ilDB implements DB{
 
 	const TABLE_SETTINGS = 'xrep_local_settings';
 
-	public function __construct(\ilDB $db) {
+	public function __construct($db) {
 		$this->gDB = $db;
 	}
 
@@ -35,15 +35,14 @@ class ilDB implements DB{
 			$query = 'REPLACE INTO '.static::TABLE_SETTINGS
 				.'(obj_id, id, ' //primaries
 				.'title, type, ref_id) VALUES ('
-				.$this->gDB->quote($vals['obj_id'], 'integer') .', '
+				.$this->gDB->quote($obj_id, 'integer') .', '
 				.$this->gDB->quote($vals['id'], 'text') .', '
 				.$this->gDB->quote($vals['title'], 'text') .', '
 				.$this->gDB->quote($vals['type'], 'text') .', '
-				.$this->gDB->quote($vals['ref_id'], 'iteger')
+				.$this->gDB->quote($vals['ref_id'], 'integer')
 				.')';
 
-			var_dump($query);
-			//$this->gDB->manipulate($query);
+			$this->gDB->manipulate($query);
 		}
 	}
 
@@ -65,7 +64,17 @@ class ilDB implements DB{
 		if($this->gDB->numRows($res) == 0) {
 			return false;
 		}
-		return $this->gDB->fetchAssoc($res)['package'];
+		$ret = array();
+		while ($rec = $this->gDB->fetchAssoc($res)) {
+			$setting = new RepositoryReportsSetting(
+				$rec['id'],
+				$rec['title'],
+				$rec['type'],
+				$rec['ref_id']
+			);
+			array_push($ret, $setting);
+		}
+		return $ret;
 	}
 
 	/**

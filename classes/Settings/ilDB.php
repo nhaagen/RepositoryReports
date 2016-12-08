@@ -97,8 +97,14 @@ class ilDB { //implements DB {
 	 *
 	 * @param 	int 	$obj_id
 	 */
-	public function deleteFor($obj_id){
+	public function deleteFor($obj_id, $field_ids){
+		$query = 'DELETE FROM '.static::TABLE_SETTINGS
+			.' WHERE obj_id = ' .$this->gDB->quote($obj_id, 'integer')
+			.' AND id IN (\''
+			.join("', '", $field_ids)
+			.'\')';
 
+		$this->gDB->manipulate($query);
 	}
 
 

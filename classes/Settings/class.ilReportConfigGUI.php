@@ -48,6 +48,7 @@ class ilReportConfigGUI {
 		switch ($cmd) {
 			case self::CMD_STORE:
 			case self::CMD_ADDITEM:
+			case self::CMD_DELETEITEM:
 				$this->$cmd();
 				break;
 
@@ -71,6 +72,7 @@ class ilReportConfigGUI {
 				$setting->id() //postvar
 			);
 			$form->addItem($repfield);
+
 			$formvalues[$setting->id()] = array(
 				'title' => $setting->title(),
 				'type' => $setting->type(),
@@ -80,6 +82,7 @@ class ilReportConfigGUI {
 
 		$form->setValuesByArray($formvalues);
 
+		$form->addCommandButton(self::CMD_DELETEITEM, "delete items");
 		$form->addCommandButton(self::CMD_ADDITEM, "(save and) add item");
 		$form->addCommandButton(self::CMD_STORE, "save");
 		$form->setFormAction($this->gCtrl->getFormAction($this));
@@ -120,7 +123,23 @@ class ilReportConfigGUI {
 		$this->$cmd();
 	}
 
+	public function cfgDelItem() {
+		$post = $_POST;
+		$mark = array();
 
+		foreach ($post as $key => $value) {
+			if(substr($key, -7) === '_delete') {
+				$len = strlen($key);
+				$var = substr($key, 0, $len - 7);
+				array_push($mark, $var);
+			}
+		}
+
+		$this->deleteFromDB($mark);
+
+		$cmd = self::CMD_CONFIG;
+		$this->$cmd();
+	}
 
 
 	/**
@@ -129,6 +148,9 @@ class ilReportConfigGUI {
 	private function readDB() {
 		$db = new Settings\ilDB($this->gDB);
 		$values = $db->selectFor($this->parent->getObjId());
+		if($values === false) {
+			$values = array();
+		}
 		return $values;
 	}
 
@@ -139,6 +161,14 @@ class ilReportConfigGUI {
 		$db = new Settings\ilDB($this->gDB);
 		$db->update($this->parent->getObjId(), $settings);
 	}
+
+
+	private function deleteFromDB($field_ids) {
+		$db = new Settings\ilDB($this->gDB);
+		$db->deleteFor($this->parent->getObjId(), $field_ids);
+	}
+
+
 
 	/**
 	* @return array <Settings\RepositoryReportsSetting>

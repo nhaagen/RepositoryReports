@@ -57,6 +57,11 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 	*/
 	function insert(&$a_tpl){
 	//	$html = $this->render();
+
+		$inpt_chkbox = '<input type="checkbox"'
+			.' name="' .$this->getFieldId() .'_delete"'
+			.' />';
+
 		$inpt_title = '<input type="text"'
 			.' name="' .$this->getFieldId() .'_title_rf"'
 			.' value="' .$this->getValue()['title'] .'"'
@@ -71,6 +76,7 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 			.'/>';
 
 		$html = join('&nbsp;', array(
+			$inpt_chkbox,
 			$inpt_title,
 			$inpt_ftype,
 			$inpt_refid

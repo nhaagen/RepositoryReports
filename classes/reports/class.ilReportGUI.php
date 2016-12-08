@@ -4,7 +4,10 @@ require_once("Services/Form/classes/class.ilPropertyFormGUI.php");
 class ilReportGUI {
 
 	const CMD_EXECREPORT = "executeReport";
-	const CMD_STANDARD = "selectReport";
+
+	const CMD_REPORTHTML = "showHTMLReport";
+	const CMD_REPORTXLS = "xlsReport";
+	const CMD_STANDARD = "showSelection";
 
 	/**
 	 * @var \Closure
@@ -31,16 +34,13 @@ class ilReportGUI {
 
 	public function executeCommand() {
 		$cmd = $this->gCtrl->getCmd();
+
 		switch ($cmd) {
-			case self::CMD_EXECREPORT:
-				//which report?
-				$selected_report = @$_POST['report'];
-				if($selected_report) {
-					$this->$cmd($selected_report);
-				}
+			case self::CMD_REPORTHTML:
+			case self::CMD_REPORTXLS:
+				$this->$cmd();
 				break;
 
-			case 'reportGUI':
 			default:
 				$cmd = self::CMD_STANDARD;
 				$this->$cmd();
@@ -48,43 +48,30 @@ class ilReportGUI {
 	}
 
 
-	private function selectReport() {
+
+	private function showSelection() {
 		$form = new \ilPropertyFormGUI();
-		//$form->addCommandButton(self::CMD_EXECREPORT, $this->txt("generate_report"));
-		$form->addItem($this->reportSelectionInput());
-		$form->addCommandButton(self::CMD_EXECREPORT, "generate_report");
 		$form->setFormAction($this->gCtrl->getFormAction($this));
 
+		$form->addCommandButton(self::CMD_REPORTHTML, "Show Report");
+		$form->addCommandButton(self::CMD_REPORTXLS, "Excel Export");
 		$this->gTpl->setContent($form->getHtml());
+
+
+
 	}
-
-
-	private function reportSelectionInput() {
-		//$si = new \ilSelectInputGUI($this->txt("possible_packages"), ilActions::F_PACKAGE);
-		$options = $this->availableReports();
-		//property-label, input name
-		$si = new \ilSelectInputGUI("possible reports", 'report');
-		$si->setOptions($options);
-		return $si;
-	}
-
-
-	private function availableReports() {
-		return array(
-			'dummyreport' => 'Dummy',
-			'dummyreport2' => 'Dummy2'
-		);
-	}
-
-
-	private function executeReport($report) {
+	private function showHTMLReport() {
+		//add back-button
 		$titles = $this->getRow();
 		$rowdata = $this->getRowData();
 		$this->gTpl->setContent($this->htmlTable($titles, $rowdata));
-		//$this->exportXLS($titles, $rowdata);
 	}
 
-
+	private function xlsReport() {
+		$titles = $this->getRow();
+		$rowdata = $this->getRowData();
+		$this->exportXLS($titles, $rowdata);
+	}
 
 
 	private function htmlTable(array $titles, array $rowdata) {
@@ -147,10 +134,6 @@ class ilReportGUI {
 
 		$workbook->close();
 	}
-
-
-
-
 
 
 

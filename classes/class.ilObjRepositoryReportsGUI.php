@@ -63,7 +63,8 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 
 		switch ($cmd) {
 			case self::CMD_REPORTGUI:
-			case ilReportGUI::CMD_EXECREPORT:
+			case ilReportGUI::CMD_REPORTHTML:
+			case ilReportGUI::CMD_REPORTXLS:
 				$this->gTabs->setTabActive(self::CMD_REPORTGUI);
 				$gui = new ilReportGUI($this, $this->plugin->txtClosure());
 				$this->gCtrl->forwardCommand($gui);
@@ -74,7 +75,6 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 			case ilReportConfigGUI::CMD_STORE:
 			case ilReportConfigGUI::CMD_DELETEITEM:
 			case ilReportConfigGUI::CMD_ADDITEM:
-			//case 'showRepositorySelection':
 				$this->gTabs->setTabActive(self::CMD_CONFIG);
 				$gui = new ilReportConfigGUI($this, $this->plugin->txtClosure());
 				$this->gCtrl->forwardCommand($gui);

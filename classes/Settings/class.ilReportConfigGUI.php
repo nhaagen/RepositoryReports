@@ -82,10 +82,10 @@ class ilReportConfigGUI {
 
 		$form->setValuesByArray($formvalues);
 
+		$form->setFormAction($this->gCtrl->getFormAction($this));
 		$form->addCommandButton(self::CMD_DELETEITEM, "delete items");
 		$form->addCommandButton(self::CMD_ADDITEM, "(save and) add item");
 		$form->addCommandButton(self::CMD_STORE, "save");
-		$form->setFormAction($this->gCtrl->getFormAction($this));
 
 		$this->gTpl->setContent($form->getHtml());
 
@@ -167,7 +167,6 @@ class ilReportConfigGUI {
 		$db = new Settings\ilDB($this->gDB);
 		$db->deleteFor($this->parent->getObjId(), $field_ids);
 	}
-
 
 
 	/**

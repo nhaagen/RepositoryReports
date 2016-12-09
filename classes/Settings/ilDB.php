@@ -36,7 +36,7 @@ class ilDB { //implements DB {
 				.'(obj_id, id, ' //primaries
 				.'title, type, ref_id) VALUES ('
 				.$this->gDB->quote($obj_id, 'integer') .', '
-				.$this->gDB->quote($vals['id'], 'text') .', '
+				.$this->gDB->quote($vals['id'], 'integer') .', '
 				.$this->gDB->quote($vals['title'], 'text') .', '
 				.$this->gDB->quote($vals['type'], 'text') .', '
 				.$this->gDB->quote($vals['ref_id'], 'integer')
@@ -67,7 +67,7 @@ class ilDB { //implements DB {
 		$ret = array();
 		while ($rec = $this->gDB->fetchAssoc($res)) {
 			$setting = new RepositoryReportsSetting(
-				$rec['id'],
+				intval($rec['id']),
 				$rec['title'],
 				$rec['type'],
 				$rec['ref_id']
@@ -84,11 +84,11 @@ class ilDB { //implements DB {
 
 		$res = $this->gDB->query($query);
 		if($this->gDB->numRows($res) == 0) {
-			return 'f1';
+			return 1;
 		}
 		$sid = $this->gDB->fetchAssoc($res)['id'];
-		$nu =  intval(substr($sid, 1)) + 1;
-		return 'f' .$nu;
+		$nu =  $sid + 1;
+		return $nu;
 	}
 
 

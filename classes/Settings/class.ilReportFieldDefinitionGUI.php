@@ -32,6 +32,7 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 			"memberbelow",
 			"learningprogress"
 		);
+		$options = RepositoryReportsSetting::validTypes();
 
 		$html = '<select '
 			.' name="' .$this->getFieldId() .'_ftype_rf">';

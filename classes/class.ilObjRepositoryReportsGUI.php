@@ -5,7 +5,7 @@
 include_once("./Services/Repository/classes/class.ilObjectPluginGUI.php");
 require_once(__DIR__."/autoload.php");
 
-require_once(__DIR__."/reports/class.ilReportGUI.php");
+require_once(__DIR__."/Reports/class.ilReportGUI.php");
 require_once(__DIR__."/Settings/class.ilReportConfigGUI.php");
 
 /**

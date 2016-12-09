@@ -7,12 +7,12 @@ namespace CaT\Plugins\RepositoryReports\Settings;
 class RepositoryReportsSetting {
 
 	/**
-	 * @var string
+	 * @var integer
 	 */
 	private $id;
 
 	/**
-	 * @var title
+	 * @var string
 	 */
 	private $title;
 
@@ -28,12 +28,16 @@ class RepositoryReportsSetting {
 
 
 	private static $VALID_TYPES = array(
-		'blank', 'memberbelow', 'learningprogress'
+		'blank', //allways empty string
+		'memberbelow', //title of course below ref_id the user is member of
+		'learningprogress', //lp of user in ref_id
+		'lpmembership' //give fieldId instead of object.ref_id;
+					   //do memberbelow-lookup and return progress for result and user
 	);
 
 
 	public function __construct($id, $title, $type, $ref_id) {
-		assert('is_string($id)');
+		assert('is_int($id)');
 		assert('is_string($title)');
 		assert('is_string($type)');
 		//assert('(is_int($ref_id) || $ref_id=='')';
@@ -62,6 +66,11 @@ class RepositoryReportsSetting {
 	public function isValidType($type) {
 		return in_array($type, self::$VALID_TYPES);
 	}
+
+	public function validTypes() {
+		return self::$VALID_TYPES;
+	}
+
 
 
 	/**

@@ -9,7 +9,7 @@ require_once(__DIR__."/Reports/class.ilReportGUI.php");
 require_once(__DIR__."/Settings/class.ilReportConfigGUI.php");
 
 /**
-* User Interface class for Jill repository object.
+* User Interface class for repository object.
 * ...
 * @ilCtrl_isCalledBy ilObjRepositoryReportsGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
 * @ilCtrl_Calls      ilObjRepositoryReportsGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI
@@ -21,7 +21,7 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 	const PLUGIN_TYPE = "xrep";
 	const CMD_INFO = "showContent";
 	const CMD_REPORTGUI = "reportGUI";
-	const CMD_CONFIG = "configureReport";
+	const CMD_CONFIG = "editProperties";
 
 
 	const CMD_STANDARD = "showContent";
@@ -32,13 +32,6 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 	protected function afterConstructor() {
 		global $tpl, $ilCtrl, $ilTabs, $ilUser, $ilToolbar, $ilAccess, $ilDB;
 
-		/**
-		 * @var $tpl       ilTemplate
-		 * @var $ilCtrl    ilCtrl
-		 * @var $ilTabs    ilTabsGUI
-		 * @var $ilUser    ilObjUser
-		 * @var $ilToolbar ilToolbarGUI
-		 */
 		$this->gTpl = $tpl;
 		$this->gCtrl = $ilCtrl;
 		$this->gTabs = $ilTabs;
@@ -60,7 +53,6 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 	* Handles all commmands of this class, centralizes permission checks
 	*/
 	function performCommand($cmd) {
-
 		switch ($cmd) {
 			case self::CMD_REPORTGUI:
 			case ilReportGUI::CMD_REPORTHTML:
@@ -75,13 +67,16 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 			case ilReportConfigGUI::CMD_STORE:
 			case ilReportConfigGUI::CMD_DELETEITEM:
 			case ilReportConfigGUI::CMD_ADDITEM:
+
+			case ilReportConfigGUI::CMD_EDITPROPS:
+			case ilReportConfigGUI::CMD_SAVEPROPS:
+
 				$this->gTabs->setTabActive(self::CMD_CONFIG);
 				$gui = new ilReportConfigGUI($this, $this->plugin->txtClosure());
 				$this->gCtrl->forwardCommand($gui);
 				break;
 
 			default:
-				print 'default';
 				$this->$cmd();
 				break;
 		}
@@ -108,7 +103,10 @@ class ilObjRepositoryReportsGUI extends ilObjectPluginGUI {
 	protected function setTabs() {
 		$this->gTabs->addTab(self::CMD_STANDARD, $this->txt('info'), $this->gCtrl->getLinkTarget($this, self::CMD_STANDARD));
 		$this->gTabs->addTab(self::CMD_REPORTGUI, $this->txt('reports'), $this->gCtrl->getLinkTarget($this, self::CMD_REPORTGUI));
-		$this->gTabs->addTab(self::CMD_CONFIG, $this->txt('config'), $this->gCtrl->getLinkTarget($this, self::CMD_CONFIG));
+
+		if($this->checkPermissionBool("write")) {
+			$this->gTabs->addTab(self::CMD_CONFIG, $this->txt('config'), $this->gCtrl->getLinkTarget($this, self::CMD_CONFIG));
+		}
 
 		parent::setTabs();
 		return true;

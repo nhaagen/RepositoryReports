@@ -9,3 +9,17 @@ xrep_read#:#Lesen
 xrep_write#:#Schreiben
 xrep_delete#:#Löchen
 xrep_edit_permission#:#Rechte ändern
+config#:#Einstellungen
+reports#:#Report
+show_report#:#HTML Ausgabe
+xls_report#:#XLS herunterladen
+settings#:#Einstellungen
+report_config#:#Report Konfiguration
+obj_config_report#:#Report konfigurieren
+obj_report_title#:#Report erzeugen
+save#:#Speichern
+title#:#Titel
+obj_title#:#Titel
+description#:#Beschreibung
+obj_description#:#Beschreibung
+obj_edit_settings#:#Einstellungen bearbeiten

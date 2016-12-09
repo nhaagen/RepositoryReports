@@ -34,12 +34,12 @@ class ilDB { //implements DB {
 			$vals = $setting->toArray();
 			$query = 'REPLACE INTO '.static::TABLE_SETTINGS
 				.'(obj_id, id, ' //primaries
-				.'title, type, ref_id) VALUES ('
+				.'title, type, value) VALUES ('
 				.$this->gDB->quote($obj_id, 'integer') .', '
 				.$this->gDB->quote($vals['id'], 'integer') .', '
 				.$this->gDB->quote($vals['title'], 'text') .', '
 				.$this->gDB->quote($vals['type'], 'text') .', '
-				.$this->gDB->quote($vals['ref_id'], 'integer')
+				.$this->gDB->quote($vals['value'], 'text')
 				.')';
 
 			$this->gDB->manipulate($query);
@@ -70,7 +70,7 @@ class ilDB { //implements DB {
 				intval($rec['id']),
 				$rec['title'],
 				$rec['type'],
-				$rec['ref_id']
+				$rec['value']
 			);
 			array_push($ret, $setting);
 		}
@@ -136,9 +136,9 @@ class ilDB { //implements DB {
 				'length' => 32,
 				'notnull' => true
 			),
-			'ref_id' => array(
-				'type' => 'integer',
-				'length' => 8,
+			'value' => array(
+				'type' => 'text',
+				'length' => 128,
 				'notnull' => false
 			)
 		);

@@ -3,6 +3,7 @@ require_once("Services/Form/classes/class.ilPropertyFormGUI.php");
 require_once("class.ilReportFieldDefinitionGUI.php");
 
 use CaT\Plugins\RepositoryReports\Settings;
+
 /**
  *
  * @ilCtrl_Calls ilReportConfigGUI: ilFormPropertyDispatchGUI
@@ -10,12 +11,15 @@ use CaT\Plugins\RepositoryReports\Settings;
 
 class ilReportConfigGUI {
 
+	const CMD_EDITPROPS = "editProperties";
+	const CMD_SAVEPROPS = "saveProperties";
+
 	const CMD_CONFIG = "configureReport";
 	const CMD_STORE = "cfgStore";
 	const CMD_DELETEITEM = "cfgDelItem";
 	const CMD_ADDITEM = "cfgAddItem";
 
-	const CMD_STANDARD = "configureReport";
+	const CMD_STANDARD = "editProperties";
 
 	/**
 	 * @var \Closure
@@ -42,17 +46,32 @@ class ilReportConfigGUI {
 
 	}
 
+	/**
+	 * @param 	string	$code
+	 * @return	string
+	 */
+	protected function txt($code) {
+		assert('is_string($code)');
+		$txt = $this->txt;
+		return $txt($code);
+	}
+
 	public function executeCommand() {
 		$cmd = $this->gCtrl->getCmd();
+		$this->setSubTabs();
 
 		switch ($cmd) {
+			case self::CMD_EDITPROPS:
+			case self::CMD_SAVEPROPS:
+
+			case self::CMD_CONFIG:
 			case self::CMD_STORE:
 			case self::CMD_ADDITEM:
 			case self::CMD_DELETEITEM:
+
 				$this->$cmd();
 				break;
 
-			case self::CMD_CONFIG:
 			default:
 				$cmd = self::CMD_STANDARD;
 				$this->$cmd();
@@ -60,7 +79,67 @@ class ilReportConfigGUI {
 	}
 
 
+	protected function setSubTabs() {
+		$this->gTabs->addSubTab(self::CMD_EDITPROPS, $this->txt('settings'), $this->gCtrl->getLinkTarget($this->parent, self::CMD_EDITPROPS));
+		$this->gTabs->addSubTab(self::CMD_CONFIG, $this->txt('report_config'), $this->gCtrl->getLinkTarget($this->parent, self::CMD_CONFIG));
+	}
+
+
+	protected function editProperties($form = null) {
+		$this->gTabs->setSubTabActive(self::CMD_EDITPROPS);
+		if($form === null) {
+			$form = $this->initForm();
+			$object = $this->parent->object;
+			$values = array(
+				'title' => $object->getTitle(),
+				'description' => $object->getDescription()
+			);
+			$form->setValuesByArray($values);
+		}
+
+		$form->addCommandButton(self::CMD_SAVEPROPS, $this->txt("save"));
+		$form->setFormAction($this->gCtrl->getFormAction($this));
+		$form->setTitle($this->txt('obj_edit_settings'));
+
+		$this->gTpl->setContent($form->getHtml());
+	}
+
+	protected function saveProperties() {
+		$post = $_POST;
+		$form = $this->initForm();
+		if(!$form->checkInput()) {
+			$form->setValuesByPost();
+			\ilUtil::sendFailure($this->txt("not_saved"), true);
+			$this->editProperties($form);
+			return;
+		}
+
+		$obj= $this->parent->object;
+		$obj->setTitle($post['title']);
+		$obj->setDescription($post['description']);
+		$obj->update();
+		$this->gCtrl->redirect($this, self::CMD_EDITPROPS);
+	}
+
+
+	protected function initForm() {
+		$form = new \ilPropertyFormGUI();
+
+		$ti = new \ilTextInputGUI($this->txt('obj_title'), 'title');
+		$ti->setRequired(true);
+		$form->addItem($ti);
+
+		$ta = new \ilTextAreaInputGUI($this->txt('obj_description'), 'description');
+		$form->addItem($ta);
+
+		return $form;
+	}
+
+
+
+
 	public function configureReport() {
+		$this->gTabs->setSubTabActive(self::CMD_CONFIG);
 		$form = new \ilPropertyFormGUI();
 		$formvalues = array();
 
@@ -76,7 +155,7 @@ class ilReportConfigGUI {
 			$formvalues[$setting->id()] = array(
 				'title' => $setting->title(),
 				'type' => $setting->type(),
-				'ref_id' => $setting->ref_id(),
+				'value' => $setting->value(),
 			);
 		}
 
@@ -86,7 +165,7 @@ class ilReportConfigGUI {
 		$form->addCommandButton(self::CMD_DELETEITEM, "delete items");
 		$form->addCommandButton(self::CMD_ADDITEM, "(save and) add item");
 		$form->addCommandButton(self::CMD_STORE, "save");
-
+		$form->setTitle($this->txt('obj_config_report'));
 		$this->gTpl->setContent($form->getHtml());
 
 	}
@@ -192,7 +271,7 @@ class ilReportConfigGUI {
 					$id,
 					$data['title'],
 					$data['ftype'],
-					$data['refid']
+					$data['value']
 				);
 			array_push($ret, $setting);
 		}

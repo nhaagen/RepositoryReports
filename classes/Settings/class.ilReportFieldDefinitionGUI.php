@@ -3,8 +3,8 @@ namespace CaT\Plugins\RepositoryReports\Settings;
 include_once("./Services/Form/classes/class.ilFormPropertyGUI.php");
 
 /**
-* This class represents a child of repository selector in a property form.
-*
+* edit-line for report-field definition;
+* inputs per row: title, type-selection and ref_id
 *
 * @author Nils Haagen <nils.haagen@concepts-and-training.de>
 *
@@ -20,18 +20,13 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 		$this->setType("repfield");
 		$this->setValue(array(
 			'title' => '',
-			'type' => 'blank',
-			'ref_id' => -1
+			'type' => 'fix',
+			'value' => ''
 		));
 	}
 
 
 	private function buildSelect() {
-		$options = array(
-			"blank",
-			"memberbelow",
-			"learningprogress"
-		);
 		$options = RepositoryReportsSetting::validTypes();
 
 		$html = '<select '
@@ -57,7 +52,6 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 	* @return	int	Size
 	*/
 	function insert(&$a_tpl){
-	//	$html = $this->render();
 
 		$inpt_chkbox = '<input type="checkbox"'
 			.' name="' .$this->getFieldId() .'_delete"'
@@ -71,16 +65,16 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 
 		$inpt_ftype = $this->buildSelect();
 
-		$inpt_refid = '<input type="text"'
-			.' name="' .$this->getFieldId() .'_refid_rf"'
-			.' value="' .$this->getValue()['ref_id'] .'"'
+		$inpt_value = '<input type="text"'
+			.' name="' .$this->getFieldId() .'_value_rf"'
+			.' value="' .$this->getValue()['value'] .'"'
 			.'/>';
 
 		$html = join('&nbsp;', array(
 			$inpt_chkbox,
 			$inpt_title,
 			$inpt_ftype,
-			$inpt_refid
+			$inpt_value
 		));
 
 		$a_tpl->setCurrentBlock("prop_generic");
@@ -89,7 +83,7 @@ class ilReportFieldDefinitionGUI extends \ilFormPropertyGUI {
 	}
 
 	/**
-	* @param array $value 	array with keys: title, type, ref_id
+	* @param array $value 	array with keys: title, type, value
 	*/
 	public function setValue($value) {
 		//check validity!

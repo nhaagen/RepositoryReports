@@ -1,8 +1,9 @@
 <?php
 
 namespace CaT\Plugins\RepositoryReports\Settings;
+
 /**
- * This is the object for additional settings.
+ * This is the settings-object for report configuration
  */
 class RepositoryReportsSetting {
 
@@ -17,18 +18,19 @@ class RepositoryReportsSetting {
 	private $title;
 
 	/**
-	 * @var string "blank"||"memberbelow"||"learningprogress"
+	 * @var string (see: VALID_TYPES)
 	 */
 	private $type;
 
 	/**
-	 * @var integer
+	 * @var string
 	 */
-	private $ref_id;
+	private $value;
 
 
 	private static $VALID_TYPES = array(
-		'blank', //allways empty string
+		'fix', //fixed value
+		'userfield', //fieldname in usr_data
 		'memberbelow', //title of course below ref_id the user is member of
 		'learningprogress', //lp of user in ref_id
 		'lpmembership' //give fieldId instead of object.ref_id;
@@ -36,42 +38,36 @@ class RepositoryReportsSetting {
 	);
 
 
-	public function __construct($id, $title, $type, $ref_id) {
+	public function __construct($id, $title, $type, $value) {
 		assert('is_int($id)');
 		assert('is_string($title)');
 		assert('is_string($type)');
-		//assert('(is_int($ref_id) || $ref_id=='')';
 
 		if(! $this->isValidType($type)) {
 			throw new \InvalidArgumentException('not a valid type: ' .$type);
 		}
-
-		/*
-		if(trim($id) === '') {
-			throw new \InvalidArgumentException('internal name must not be empty string');
-		}
-		*/
-
 		$this->id = $id;
 		$this->title = $title;
 		$this->type = $type;
-		$this->ref_id = $ref_id;
+		$this->value = $value;
 	}
 
 	/**
-	 * validate type; must be "int", "ref" of "txt"
+	 * validate type
 	 *
 	 * @return boolean
 	 */
 	public function isValidType($type) {
 		return in_array($type, self::$VALID_TYPES);
 	}
-
+	/**
+	 * valid types
+	 *
+	 * @return array <string>
+	 */
 	public function validTypes() {
 		return self::$VALID_TYPES;
 	}
-
-
 
 	/**
 	 * get setting values as array
@@ -83,19 +79,35 @@ class RepositoryReportsSetting {
 			'id' => $this->id,
 			'title' => $this->title,
 			'type' => $this->type,
-			'ref_id' => $this->ref_id
+			'value' => $this->value
 		);
 	}
 
-
+	/**
+	 * get id
+	 *
+	 * @return int
+	 */
 	public function id() {
 		return $this->id;
 	}
+
+	/**
+	 * get title
+	 *
+	 * @return string
+	 */
 	public function title() {
 		return $this->title;
 	}
-	public function ref_id() {
-		return $this->ref_id;
+
+	/**
+	 * get value
+	 *
+	 * @return mixed
+	 */
+	public function value() {
+		return $this->value;
 	}
 
 	/**
